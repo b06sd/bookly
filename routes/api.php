@@ -18,6 +18,10 @@ Route::group(['prefix' => '/v1', 'namespace' => 'Api\V1', 'as' => 'api.'], funct
   Route::post('/register', 'UserController@register');
 
   Route::middleware('auth:api')->group(function () {
-    Route::resource('/users', 'UserController');
+    Route::get('/books', 'BookController@index');
+    Route::get('books/{book}', 'BookController@show');
+    Route::post('books', 'BookController@store');
+    Route::put('books/{book}', 'BookController@update');
+    Route::delete('books/{book}', 'BookController@delete');    
   });
 });
