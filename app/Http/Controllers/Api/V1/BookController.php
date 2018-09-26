@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\User;
 use App\Book;
+use Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -36,6 +39,7 @@ class BookController extends Controller
   */
   public function store(Request $request)
   {
+    $userInformation = $request->user();
     $rules = [
         'title' => 'required|string',
         'ISBN' => 'required|string',
@@ -48,12 +52,18 @@ class BookController extends Controller
         return $this->errorResponse($validate->errors());
     }
 
+    if ($userInformation->role == 'Guest')
+    {
+      return $this->errorResponse('Guest cannot perform request', $userInformation);
+    }
+
     $payload = [
       'title' => $request->input('title'),
       'ISBN' => $request->input('ISBN'),
       'publisher' => $request->input('publisher'),
     ];
 
+    
     $book = Book::create($payload);
 
     return $this->successResponse('book created', $book);
@@ -68,7 +78,8 @@ class BookController extends Controller
   */
   public function show($id)
   {
-    return Book::find($id);
+    $singleBook = Book::where('id', $id)->get();
+    return $this->successResponse('book found', $singleBook);
   }
 
   /**
@@ -103,11 +114,16 @@ class BookController extends Controller
   * @param  int  $id
   * @return \Illuminate\Http\Response
   */
-  public function destroy($id)
+  public function destroy(Request $request)
   {
-    $book = Book::findOrFail($id);
+    $userInformation = $request->user();
+    if ($userInformation->role == 'Guest')
+    {
+      return $this->errorResponse('Guest cannot perform request', $userInformation);
+    }
+    $book = Book::where('id', $request->id);
     $book->delete();
 
-    return 204;
+    return $this->successResponse('book found', $book);
   }
 }

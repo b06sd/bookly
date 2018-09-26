@@ -12,4 +12,9 @@ class Book extends BaseModel
 
 
   protected $fillable = ['title', 'ISBN', 'publisher', 'publication_year'];
+
+  public function user()
+  {
+    return $this->belongsTo('App\User');
+  }
 }

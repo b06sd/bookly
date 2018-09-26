@@ -57,4 +57,9 @@ class User extends BaseModel
   {
     return $this->role == 'Guest' ? true : false;
   }
+
+  public function books()
+  {
+    return $this->hasMany('App\Book');
+  }
 }
